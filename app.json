@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "arProject",
+    "slug": "arProject",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
