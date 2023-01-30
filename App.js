@@ -1,83 +1,83 @@
-import React, { useState } from 'react';
-import {
-  Button,
-  View,
-  FlatList
-} from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { View, ImageBackground, TextInput, ActivityIndicator, Text } from 'react-native';
 import css from './styles/Style';
-import GoalItem from './Components/GoalItem';
-import GoalInput from './Components/GoalInput';
-
+import axios from 'axios';
+const api = {
+  key: "f13ad93756fbadc14a5a500b211a8fef",
+  base: "https://api.openweathermap.org/data/2.5/"
+}
 export default function App() {
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState([])
+  const fetchDataHandler = useCallback(() => {
+    setInput(true);
+    setInput('');
+    axios({
+      method: "GET",
+      url: `${api.base}weather?q=${input}&units=metric&APPID=${api.key}`,
 
+    }).then(
+      response => {
+        console.log(response.data);
+        setData(response.data)
+      }
+    ).catch(error => console.dir(error))
+      .finally(() => setLoading(false))
 
-  const [enteredGoalText, setEnteredGoalText] = useState('');
-  const [addData, setAddData] = useState([]);
-  const [state, setState] = useState(false);
-
-  const handleClick = () => {
-    if (state) {
-      setState(false)
-    } else {
-      setState(true)
-    }
-    console.log(state)
-  }
-
-  function goalInputHandler(entredText) {
-    setEnteredGoalText(entredText)
-  }
-  function addGoalHandler() {
-    if (enteredGoalText.length) {
-
-      setAddData(addData => [
-        ...addData,
-        { text: enteredGoalText, key: Math.random().toString() }
-      ])
-    }
-    setEnteredGoalText('');
-  }
-  function deleteGoalHandler(id){
-
-    console.log(id);
-    setAddData(addData =>{
-      return addData.filter((goal)=> goal.id !== id);
-
-    })
-  }
+  }, [api.base, api.key, input])
   return (
     <>
-
-      <View style={css.appContainer} >
-        <View style={css.btnCard}>
-          <Button title={state ? "true" : "false"} onPress={handleClick} />
-        </View>
-        <GoalInput
-          enteredGoalText={enteredGoalText}
-          goalInputHandler={goalInputHandler}
-          addGoalHandler={addGoalHandler}
-        />
-        <FlatList
-
-          data={addData}
-          alwaysBounceVertical={false}
-          renderItem={(item) => {
-            return (
-              <GoalItem 
-              item={item.item.text}
-              id={item.id}
-              deleteGoalHandler={deleteGoalHandler}
-              
-              />
-              // console.log(item.item.text)
-            )
-          }}
-          keyExtractor={(item, index) => {
-            return item.id
-          }}
+      <View style={css.root} >
+        {/* root ==================== */}
+        <ImageBackground
+          source={require("./assets/nature1.jpg")}
+          style={css.image}
         >
+          <View style={css.container}>
+            <View style={css.mt50}>
+              <TextInput
+                style={css.inputControl}
+                placeholder='Search...'
+                onChangeText={text => setInput(text)}
+                value={input}
+                placeholderTextColor={'#000'}
+                onSubmitEditing={fetchDataHandler}
+              />
+            </View>
+            {/* mt50 ==================== */}
+            {
+              loading && (
+                <View >
+                  <ActivityIndicator size={'large'} color="#fff" />
+                </View>
+              )
+            }
 
-        </FlatList>
+            {
+              data ? (<View style={css.infoView}>
+                <Text style={css.cityCountryText}>
+                  {data?.name !== undefined &&
+                    data?.sys?.country !== undefined ?
+                    `${data?.name} ${data?.sys?.country}` :
+                    ""}
+                </Text>
+                <Text style={css.dateText}>
+                  {new Date().toLocaleString()}
+                </Text>
+                <Text style={css.tempText}>
+                  {data?.main?.temp !== undefined ? `${Math.round(data?.main?.temp)} ℃` : ""}
+                </Text>
+                <Text style={css.minMaxText}>{`Min ${data?.main?.temp_min !== undefined ? Math.round(data?.main?.temp_min) : ""} ℃ / Max ${data?.main?.temp_max !== undefined ? Math.round(data?.main?.temp_max) : ""}`}</Text>
+
+              </View>) : ""
+
+            }
+          </View>
+          {/* container ==================== */}
+
+        </ImageBackground>
+
       </View>
 
     </>

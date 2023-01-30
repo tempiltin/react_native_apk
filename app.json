@@ -1,8 +1,9 @@
 {
   "expo": {
-    "name": "arProject",
-    "slug": "arProject",
+    "name": "Ob-havo",
+    "slug": "Tempiltin uz",
     "version": "1.0.0",
+
     "assetBundlePatterns": [
       "**/*"
     ]
